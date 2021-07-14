@@ -1,2 +1,2 @@
-# ToothPickDemo
-ToothPickDemo
+# ToothpickDemo
+ToothpickDemo
