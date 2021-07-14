@@ -139,6 +139,25 @@ extension UICollectionView {
     
 }
 
+// MARK: UIColor Extension
+
+extension UIColor {
+    
+    convenience init(hexString: String, alpha: CGFloat = 1.0) {
+        let hexString: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        let scanner = Scanner(string: hexString)
+        if (hexString.hasPrefix("#")) {
+            scanner.scanLocation = 1
+        }
+        var color: UInt32 = 0
+        scanner.scanHexInt32(&color)
+        let red   = CGFloat(Int(color >> 16) & 0x000000FF) / 255.0
+        let green = CGFloat(Int(color >> 8) & 0x000000FF) / 255.0
+        let blue  = CGFloat(Int(color) & 0x000000FF) / 255.0
+        self.init(red:red, green:green, blue:blue, alpha:alpha)
+    }
+}
+
 // MARK: TableView Extension
 
 extension UITableView {

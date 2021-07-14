@@ -104,11 +104,30 @@ extension FirstPageVC: UITableViewDelegate, UITableViewDataSource {
         performSegueIfPossible(identifier: "firstPageVCToSecondPageVC")
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let postToDelete = posts[indexPath.row]
-            delete(post: postToDelete, indexPath: indexPath)
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: nil) { (_, _, completionHandler) in
+            let postToDelete = self.posts[indexPath.row]
+            self.delete(post: postToDelete, indexPath: indexPath)
+            completionHandler(true)
         }
+        let editAction = UIContextualAction(style: .destructive, title: nil) { (_, _, completionHandler) in
+            // delete the item here
+            completionHandler(true)
+        }
+
+        deleteAction.backgroundColor = UIColor(hexString: "#E34F4F")
+        editAction.backgroundColor = UIColor(hexString: "#4CC679")
+
+        if #available(iOS 13.0, *) {
+            deleteAction.image = UIImage(named: "ic_clear")
+            editAction.image = UIImage(named: "ic_edit")
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, editAction])
+        
+        return configuration
     }
     
 }
