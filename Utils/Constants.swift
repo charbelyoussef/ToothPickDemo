@@ -15,6 +15,9 @@ struct Constants {
     struct Errors {
         static let GENERAL_ERROR = "An error has occurred."
         static let PARSING_ERROR = "Parsing error."
+        
+        static let EDIT_RESTRICTION_ERROR = "This post is not editable!"
+        static let FILL_FIELD_WARNING = "Kindly fill all field first!"
     }
 
 }

@@ -10,13 +10,10 @@ import UIKit
 class Structs: NSObject {
     
     struct Post {
-        let userId:String?
-        let id:String?
-        let title:String?
-        let body:String?
-        let isCreatedManually:Bool?
+        var userId:String?
+        var id:String?
+        var title:String?
+        var body:String?
+        var isCreatedManually:Bool?
     }
-    
-    
-    
 }

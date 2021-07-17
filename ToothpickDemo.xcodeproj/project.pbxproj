@@ -31,6 +31,9 @@
 		7C40EC24269F88A1005816C2 /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7C40EC18269F88A1005816C2 /* Roboto-Black.ttf */; };
 		7C40EC25269F88A1005816C2 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7C40EC19269F88A1005816C2 /* Roboto-Thin.ttf */; };
 		7C40EC27269F8DA2005816C2 /* SecondPageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C40EC26269F8DA2005816C2 /* SecondPageVC.swift */; };
+		7C40EC2B26A04E4E005816C2 /* CustomPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C40EC2926A04E4E005816C2 /* CustomPopup.swift */; };
+		7C40EC2C26A04E4E005816C2 /* CustomPopup.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C40EC2A26A04E4E005816C2 /* CustomPopup.xib */; };
+		7C40EC2E26A04E94005816C2 /* FadingSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C40EC2D26A04E94005816C2 /* FadingSegue.swift */; };
 		FCF3C4BD0160E6AACC02F21C /* Pods_ToothpickDemo__iOS_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFDE9822C537143897016172 /* Pods_ToothpickDemo__iOS_.framework */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +65,9 @@
 		7C40EC18269F88A1005816C2 /* Roboto-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Black.ttf"; sourceTree = "<group>"; };
 		7C40EC19269F88A1005816C2 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Thin.ttf"; sourceTree = "<group>"; };
 		7C40EC26269F8DA2005816C2 /* SecondPageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondPageVC.swift; sourceTree = "<group>"; };
+		7C40EC2926A04E4E005816C2 /* CustomPopup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomPopup.swift; sourceTree = "<group>"; };
+		7C40EC2A26A04E4E005816C2 /* CustomPopup.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CustomPopup.xib; sourceTree = "<group>"; };
+		7C40EC2D26A04E94005816C2 /* FadingSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FadingSegue.swift; sourceTree = "<group>"; };
 		923351A370F0D69E106DBA34 /* Pods-ToothpickDemo (iOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToothpickDemo (iOS).release.xcconfig"; path = "Target Support Files/Pods-ToothpickDemo (iOS)/Pods-ToothpickDemo (iOS).release.xcconfig"; sourceTree = "<group>"; };
 		FFDE9822C537143897016172 /* Pods_ToothpickDemo__iOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ToothpickDemo__iOS_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -123,6 +129,7 @@
 		7C40EBCE269F4B6E005816C2 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7C40EC2826A04E35005816C2 /* CustomViews */,
 				7C40EBFE269F553D005816C2 /* Cells */,
 				7C40EBFF269F554A005816C2 /* Storyboards */,
 			);
@@ -140,6 +147,7 @@
 		7C40EBFA269F5158005816C2 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				7C40EC2D26A04E94005816C2 /* FadingSegue.swift */,
 				7C40EC05269F5883005816C2 /* RequestManager.swift */,
 				7C40EC07269F58ED005816C2 /* Utils.swift */,
 				7C40EC09269F5A72005816C2 /* Constants.swift */,
@@ -190,6 +198,15 @@
 				7C40EC14269F88A1005816C2 /* Roboto-ThinItalic.ttf */,
 			);
 			path = fonts;
+			sourceTree = "<group>";
+		};
+		7C40EC2826A04E35005816C2 /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				7C40EC2926A04E4E005816C2 /* CustomPopup.swift */,
+				7C40EC2A26A04E4E005816C2 /* CustomPopup.xib */,
+			);
+			path = CustomViews;
 			sourceTree = "<group>";
 		};
 		A940BFD3700A63F2B5E8A0D4 /* Pods */ = {
@@ -283,6 +300,7 @@
 				7C40EC1A269F88A1005816C2 /* Roboto-BlackItalic.ttf in Resources */,
 				7C40EC24269F88A1005816C2 /* Roboto-Black.ttf in Resources */,
 				7C40EC21269F88A1005816C2 /* Roboto-MediumItalic.ttf in Resources */,
+				7C40EC2C26A04E4E005816C2 /* CustomPopup.xib in Resources */,
 				7C40EC1F269F88A1005816C2 /* Roboto-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -336,9 +354,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C40EC2B26A04E4E005816C2 /* CustomPopup.swift in Sources */,
 				7C40EC06269F5883005816C2 /* RequestManager.swift in Sources */,
 				7C40EC08269F58ED005816C2 /* Utils.swift in Sources */,
 				7C40EC01269F56F7005816C2 /* FirstPageVCContentCell.swift in Sources */,
+				7C40EC2E26A04E94005816C2 /* FadingSegue.swift in Sources */,
 				7C40EC0C269F5C16005816C2 /* Extensions.swift in Sources */,
 				7C40EBFD269F54B9005816C2 /* Structs.swift in Sources */,
 				7C40EC27269F8DA2005816C2 /* SecondPageVC.swift in Sources */,

@@ -21,22 +21,35 @@ class FirstPageVC: UIViewController {
     var postToDelete:Structs.Post?
     var selectedPost:Structs.Post?
     
+    let refreshControl = UIRefreshControl()
+
     //MARK: Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
+
+        initViews()
         getPosts()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        initViews()
+    override func viewDidAppear(_ animated: Bool) {
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+    }
+
     //MARK: Class Methods
     func initViews() {
         lblTitle.text = "My Posts"
         btnAddPost.layer.cornerRadius = btnAddPost.frame.size.height/2
+        
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        tvPosts.addSubview(refreshControl)
     }
-    
     
     func delete(post: Structs.Post, indexPath: IndexPath) {
         let alert = UIAlertController(title: "Delete Post", message: "You are about to delete this post. Are you sure you want to continue?", preferredStyle: .actionSheet)
@@ -57,16 +70,24 @@ class FirstPageVC: UIViewController {
         alert.addAction(cancelAction)
 
         alert.popoverPresentationController?.sourceView = self.view
-//        alert.popoverPresentationController?.sourceRect = CGRect(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0, 1.0, 1.0)
 
         self.present(alert, animated: true, completion: nil)
     }
 
-    //MARK: Buttons Actions
-    @IBAction func btnAddPostAction(_ sender: Any) {
-        createPost(title: "title1", body: "Bodzyyyy", userId: 1)
+    @objc func refresh(_ sender: AnyObject) {
+        getPosts()
     }
     
+    //MARK: Buttons Actions
+    @IBAction func btnAddPostAction(_ sender: Any) {
+        CustomPopup.open(title: "Create a new post",
+                         post: selectedPost,
+                         delegate: self,
+                         actionType: .create)
+
+//        createPost(title: "title1", body: "Bodzyyyy", userId: 1)
+    }
+
     //MARK: Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "firstPageVCToSecondPageVC" {
@@ -105,13 +126,22 @@ extension FirstPageVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let postSelected = self.posts[indexPath.row]
+
         let deleteAction = UIContextualAction(style: .destructive, title: nil) { (_, _, completionHandler) in
-            let postToDelete = self.posts[indexPath.row]
-            self.delete(post: postToDelete, indexPath: indexPath)
+            self.delete(post: postSelected, indexPath: indexPath)
             completionHandler(true)
         }
         let editAction = UIContextualAction(style: .destructive, title: nil) { (_, _, completionHandler) in
-            // delete the item here
+            if let isCreatedManually = postSelected.isCreatedManually, isCreatedManually {
+                self.showAlert(message: Constants.Errors.EDIT_RESTRICTION_ERROR)
+            }
+            else{
+                CustomPopup.open(title: "Edit post",
+                                 post: postSelected,
+                                 delegate: self,
+                                 actionType: .edit)
+            }
             completionHandler(true)
         }
 
@@ -139,10 +169,11 @@ extension FirstPageVC {
         
         let url = "\(Constants.urlPrefix)/posts?userId=1"
         RequestManager.sharedManager.get(url: url, headers: nil, loading: true) { response in
+            self.posts.removeAll()
             if let posts = response["data"] as? NSArray {
                 for post in posts {
                     if let postDict = post as? NSDictionary {
-                        self.parsePost(postDict: postDict) { completed in
+                        self.parsePost(postDict: postDict, actionType: .none) { completed in
                             if completed {
                                 //continue
                             }
@@ -154,6 +185,7 @@ extension FirstPageVC {
                 }
             }
             self.hideProgressBar()
+            self.refreshControl.endRefreshing()
             self.tvPosts.reloadData()
         } failure: { error in
             self.hideProgressBar()
@@ -162,73 +194,14 @@ extension FirstPageVC {
 
     }
     
-    func createPost(title:String, body:String, userId:Int){
-        showProgressBar(message: "Loading Posts")
-        
-        let url = "\(Constants.urlPrefix)/posts"
-        
-        var params: [String : AnyObject] = [:]
-        params["title"] = title as AnyObject
-        params["body"] = body as AnyObject
-        params["userId"] = userId as AnyObject
-
-        RequestManager.sharedManager.post(url: url, parameters: params, headers: nil, raw: false, loading: false) { response in
-            self.hideProgressBar()
-
-            self.parsePost(postDict: response, isCreatedManually: true) { completed in
-                if completed {
-                    self.tvPosts.reloadData()
-                }
-                else{
-                    //ShowError
-                }
-            }
-            
-            
-        } failure: { error in
-            self.hideProgressBar()
-            //ShowAlert
-        }
-    }
-    
-    func editPost(id:String, title:String, body:String, userId:Int){
-        showProgressBar(message: "Loading Posts")
-        
-        let url = "\(Constants.urlPrefix)/posts/\(id)"
-        
-        var params: [String : AnyObject] = [:]
-        params["title"] = title as AnyObject
-        params["body"] = body as AnyObject
-        params["userId"] = userId as AnyObject
-
-        
-        RequestManager.sharedManager.put(url: url, parameters: params, raw: false, loading: false) { response in
-            self.hideProgressBar()
-
-            self.parsePost(postDict: response) { completed in
-                if completed {
-                    self.tvPosts.reloadData()
-                }
-                else{
-                    //ShowError
-                }
-            }
-        } failure: { error in
-            self.hideProgressBar()
-            //ShowAlert
-        }
-    }
-    
     func deletePost(id:String){
         showProgressBar(message: "Loading Posts")
         
         let url = "\(Constants.urlPrefix)/posts/\(id)"
-
         let params: [String : AnyObject] = [:]
 
         RequestManager.sharedManager.delete(url: url, parameters: params, raw: false, loading: false) { response in
             self.hideProgressBar()
-
 //            if let postEdited = response as? NSDictionary {
                 //ShowAlert "Deleted"
 //            }
@@ -238,7 +211,8 @@ extension FirstPageVC {
         }
     }
     
-    func parsePost(postDict: NSDictionary, isCreatedManually:Bool = false, completion: (Bool) -> Void){
+    func parsePost(postDict: NSDictionary, actionType:CustomPopupActionType, isCreatedManually:Bool = false, completion: (Bool) -> Void){
+        
         if let id = postDict["id"] as? Int,
             let title = postDict["title"] as? String,
             let body = postDict["body"] as? String {
@@ -250,13 +224,60 @@ extension FirstPageVC {
             if let userIdTemp = postDict["userId"] as? String {
                 userIdStr = userIdTemp
             }
-
-            let post = Structs.Post(userId: userIdStr, id: "\(id)", title: title, body: body, isCreatedManually: isCreatedManually)
-            posts.append(post)
+            
+            if actionType == .edit {
+                if let indexOfEditedElement = posts.firstIndex(where: { $0.id == "\(id)" }) {
+//                    var postToEdit = posts[indexOfEditedElement]
+                    posts[indexOfEditedElement].title = title
+                    posts[indexOfEditedElement].body = body
+                    tvPosts.reloadRows(at: [IndexPath(item: indexOfEditedElement, section: 0)], with: .fade)
+                }
+            }
+            else{
+                let post = Structs.Post(userId: userIdStr, id: "\(id)", title: title, body: body, isCreatedManually: isCreatedManually)
+                posts.append(post)
+            }
             completion(true)
         }
         else{
             completion(false)
+        }
+    }
+}
+
+// MARK: CustomPopup Delegate Methods
+extension FirstPageVC:CustomPopupDelegate {
+    func didPerformAction(post: NSDictionary?, actionType: CustomPopupActionType) {
+        switch actionType {
+        case .create:
+            if let postDict = post {
+                self.parsePost(postDict: postDict, actionType: actionType, isCreatedManually: true) { success in
+                    if success {
+                        tvPosts.reloadData()
+                        tvPosts.scrollToBottom()
+                    }
+                    else{
+                        
+                    }
+                }
+            }
+            break
+            
+        case .edit:
+            if let postDict = post {
+                self.parsePost(postDict: postDict, actionType: actionType, isCreatedManually: true) { success in
+                    if success {
+                        tvPosts.reloadData()
+                    }
+                    else{
+                        
+                    }
+                }
+            }
+            break
+
+        default:
+            break
         }
     }
 }

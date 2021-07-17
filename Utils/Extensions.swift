@@ -127,6 +127,19 @@ extension UIViewController {
             }
         }
     }
+    
+    /**
+     Shows an alert with a message.
+     */
+    func showAlert(message:String){
+        let alert = UIAlertController(title: "ToothPick", message: message, preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+            
+        }))
+
+        self.present(alert, animated: true)
+    }
 }
 
 // MARK: CollectionView Extension
@@ -168,6 +181,10 @@ extension UITableView {
         }
     }
     
+    func scrollToBottom(){
+        let bottomOffset = CGPoint(x: 0, y: contentSize.height)
+        setContentOffset(bottomOffset, animated: true)
+    }
 }
 // MARK: UITableViewCell Extension
 
