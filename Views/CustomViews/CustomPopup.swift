@@ -172,9 +172,10 @@ class CustomPopup: FadingViewController {
     
     @IBAction func btnAction(_ sender: Any) {
         
-        switch actionType {
-        case .create:
-            if let titleStr = tfTitle.text, titleStr != "", let bodyStr = tfDescription.text, bodyStr != "" {
+        if let titleStr = tfTitle.text, titleStr != "", let bodyStr = tfDescription.text, bodyStr != "" {
+            
+            switch actionType {
+            case .create:
                 createPost(title:titleStr, body:bodyStr, userId: 1) { success in
                     self.hideProgressBar()
                     if success{
@@ -185,15 +186,9 @@ class CustomPopup: FadingViewController {
                         //Show Not Success Error
                     }
                 }
-            }
-            else{
-                self.hideProgressBar()
-                self.showAlert(message: Constants.Errors.FILL_FIELD_WARNING)
-            }
-            break
-            
-        case .edit:
-            if let titleStr = tfTitle.text, titleStr != "", let bodyStr = tfDescription.text, bodyStr != "" {
+                break
+                
+            case .edit:
                 editPost(id: postToEdit?.id ?? "N/A", title:titleStr, body:bodyStr, userId: 1) { success in
                     self.hideProgressBar()
                     if success{
@@ -204,16 +199,14 @@ class CustomPopup: FadingViewController {
                         //Show Failure Error
                     }
                 }
+                break
+                
+            default:
+                break
             }
-            else{
-                self.hideProgressBar()
-                self.showAlert(message: Constants.Errors.FILL_FIELD_WARNING)
-            }
-            break
-            
-        default:
-            break
         }
-        
+        else{
+            btnAction.shake()
+        }
     }
 }
