@@ -9,7 +9,6 @@ target 'ToothpickDemo (iOS)' do
 
 
 	pod 'Alamofire'
-	pod 'SDWebImage'
 	pod 'JGProgressHUD'
 
 end

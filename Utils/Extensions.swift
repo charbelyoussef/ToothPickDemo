@@ -140,20 +140,39 @@ extension UIViewController {
 
         self.present(alert, animated: true)
     }
-}
-
-// MARK: CollectionView Extension
-
-extension UICollectionView {
     
-    func customRegisterForCell(identifier:String) {
-        self.register(UINib(nibName: identifier, bundle: nil), forCellWithReuseIdentifier: identifier)
+    /**
+     Shows an alert popup with a custom message and optional cancel button.
+     - parameter title: The title of the error popup.
+     - parameter message: The message to display.
+     - parameter actionTitle: The text of the Confirm button.
+     - parameter cancelTitle: The text of the Cancel button. This is optional, and if set as nil the Cancel button will not be added to the popup.
+     - parameter completionBlock: The action that happens when clicking the confirmation button. This can be nil.
+     */
+    func showActionSeetWithCompletion(title:String,
+                                 message:String,
+                                 actionTitle:String = "Delete",
+                                 cancelTitle:String = "Cancel",
+                                 completionBlock: (() -> Void)?) {
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        
+        let deleteAction = UIAlertAction(title: actionTitle, style: .destructive) { action in
+            completionBlock?()
+        }
+        
+        let cancelAction = UIAlertAction(title: cancelTitle, style: .cancel)
+        
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        
+        alert.popoverPresentationController?.sourceView = self.view
+
+        present(alert, animated: true, completion: nil)
     }
-    
 }
 
 // MARK: UIColor Extension
-
 extension UIColor {
     
     convenience init(hexString: String, alpha: CGFloat = 1.0) {
@@ -172,7 +191,6 @@ extension UIColor {
 }
 
 // MARK: TableView Extension
-
 extension UITableView {
     
     func customRegisterForCell(identifiers: [String]) {
@@ -186,21 +204,9 @@ extension UITableView {
         setContentOffset(bottomOffset, animated: true)
     }
 }
-// MARK: UITableViewCell Extension
-
-extension UITableViewCell {
-    func enable(on: Bool) {
-        for view in contentView.subviews {
-            view.isUserInteractionEnabled = on
-            view.alpha = on ? 1 : 0.5
-        }
-    }
-}
 
 // MARK: UIView extension
-
 extension UIView {
-    
     func addCornerRadius(corners: UIRectCorner, cornerRadius: CGFloat) {
         let path = UIBezierPath(roundedRect: self.bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
         let maskLayer = CAShapeLayer()
@@ -230,56 +236,6 @@ extension UIView {
         self.layer.insertSublayer(gradient, at: 0)
     }
     
-    func shake() {
-        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
-        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
-        animation.duration = 0.3
-        animation.values = [-20.0, 20.0, -10.0, 10.0, -5.0, 5.0, 0.0]
-        layer.add(animation, forKey: "shake")
-    }
-    
-    func startLoadingAnimation(duration:CGFloat) {
-        self.backgroundColor = UIColor(white: 0.9, alpha: 1)
-        self.clipsToBounds = true
-        
-        let gradient = CAGradientLayer()
-        gradient.frame = CGRect(x: -self.bounds.width, y: -self.bounds.height, width: self.bounds.width*3, height: self.bounds.height*3)
-        gradient.colors = [UIColor.clear.cgColor, UIColor.gray.cgColor, UIColor.gray.cgColor, UIColor.clear.cgColor]
-        gradient.locations = [0, 0.5, 0.5, 1]
-        gradient.startPoint = CGPoint(x: -1, y: 0.4)
-        gradient.endPoint = CGPoint(x: 0, y: 0.6)
-        
-        self.layer.addSublayer(gradient)
-
-        let animation1 = CABasicAnimation(keyPath: "startPoint")
-        animation1.fromValue = CGPoint(x: -1, y: 0.4)
-        animation1.toValue = CGPoint(x: 1, y: 0.4)
-        animation1.duration = CFTimeInterval(duration)
-        animation1.repeatCount = Float.infinity
-        gradient.add(animation1, forKey: "anim1")
-        
-        let animation2 = CABasicAnimation(keyPath: "endPoint")
-        animation2.fromValue = CGPoint(x: 0, y: 0.6)
-        animation2.toValue = CGPoint(x: 2, y: 0.6)
-        animation2.duration = CFTimeInterval(duration)
-        animation2.repeatCount = Float.infinity
-        gradient.add(animation2, forKey: "anim2")
-    }
-    
-    func stopLoadingAnimation() {
-        self.layer.removeAllAnimations()
-        if let sublayers = self.layer.sublayers {
-            for case let sublayer as CAGradientLayer in sublayers {
-                sublayer.removeAllAnimations()
-                sublayer.removeFromSuperlayer()
-            }
-        }
-    }
-    
-    func addGradientBackground(colors: [CGColor], startPoint:CGPoint, endPoint:CGPoint) {
-        addGradientBackgroundWithFrame(colors: colors, startPoint: startPoint, endPoint: endPoint, frame: self.bounds)
-    }
-    
     func addShadow(radius: CGFloat, offset: CGSize, color: UIColor = .lightGray, opacity: Float = 0.5) {
         self.layer.shadowPath =
             UIBezierPath(roundedRect: self.bounds,
@@ -298,139 +254,6 @@ extension UIView {
         self.layer.shadowRadius = radius
         self.layer.masksToBounds = false
     }
-    
-    func asImage() -> UIImage {
-        let renderer = UIGraphicsImageRenderer(bounds: bounds)
-        return renderer.image { rendererContext in
-            layer.render(in: rendererContext.cgContext)
-        }
-    }
-    
-    var safeTopAnchor: NSLayoutYAxisAnchor {
-        if #available(iOS 11.0, *) {
-            return self.safeAreaLayoutGuide.topAnchor
-        }
-        return self.topAnchor
-    }
-    
-    var safeLeftAnchor: NSLayoutXAxisAnchor {
-        if #available(iOS 11.0, *){
-            return self.safeAreaLayoutGuide.leftAnchor
-        }
-        return self.leftAnchor
-    }
-    
-    var safeRightAnchor: NSLayoutXAxisAnchor {
-        if #available(iOS 11.0, *){
-            return self.safeAreaLayoutGuide.rightAnchor
-        }
-        return self.rightAnchor
-    }
-    
-    var safeBottomAnchor: NSLayoutYAxisAnchor {
-        if #available(iOS 11.0, *) {
-            return self.safeAreaLayoutGuide.bottomAnchor
-        }
-        return self.bottomAnchor
-    }
-    
-}
-
-// MARK: UILabel extension
-
-extension UILabel {
-
-    func getActualLineNumber() -> Int {
-        let height = self.text?.height(withConstrainedWidth: self.frame.size.width, font: self.font) ?? 0
-        return lroundf(Float(height/self.font.lineHeight))
-    }
-    
-    func setHTMLFromString(htmlText: String, fontSize:CGFloat = 15) {
-        let modifiedFont = String(format:"<span style=\"font-family: '-apple-system', 'HelveticaNeue'; font-size: \(fontSize)\">%@</span>", htmlText)
-
-        let attrStr = try! NSAttributedString(
-            data: modifiedFont.data(using: .unicode, allowLossyConversion: true)!,
-            options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding:String.Encoding.utf8.rawValue],
-            documentAttributes: nil)
-
-        self.attributedText = attrStr
-    }
-}
-
-// MARK: Int extension
-
-extension Int {
-    
-    func toStringwithSeparator(_ separator:String) -> String {
-        let formatter = NumberFormatter()
-        formatter.groupingSeparator = separator
-        formatter.numberStyle = .decimal
-        return formatter.string(for: self)!
-    }
-    
-}
-
-// MARK: UIImageView extension
-
-extension UIImageView {
-
-    func tint(color: UIColor) {
-        self.image = self.image?.withRenderingMode(.automatic)
-        self.tintColor = color
-    }
-    
-}
-
-// MARK: String extension
-
-extension String {
-    
-    static func emptyOrNil(string: String?) -> Bool {
-        return string == nil || string == ""
-    }
-    
-    func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
-        return ceil(boundingBox.height)
-    }
-    
-    func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font: font], context: nil)
-        return ceil(boundingBox.width)
-    }
-    
-    func capitalizeFirstLetter() -> String {
-        return prefix(1).uppercased() + self.lowercased().dropFirst()
-    }
-    
-    mutating func capitalizeFirstLetter() {
-        self = self.capitalizeFirstLetter()
-    }
-    
-    func isEmptyString() -> Bool {
-        return self == ""
-    }
-    
-    var htmlToAttributedString: NSAttributedString? {
-        guard let data = data(using: .utf8) else { return NSAttributedString() }
-        do {
-            return try NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html,
-                                                                .characterEncoding:String.Encoding.utf8.rawValue], documentAttributes: nil)
-        } catch {
-            return NSAttributedString()
-        }
-    }
-    
-    var htmlToString: String {
-        return htmlToAttributedString?.string ?? ""
-    }
-    
-    func safeURL() -> String {
-        return self.replacingOccurrences(of: " ", with: "%20")
-    }
-
 }
 
 extension UINavigationController {

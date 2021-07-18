@@ -50,30 +50,17 @@ class FirstPageVC: UIViewController {
         refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
         tvPosts.addSubview(refreshControl)
     }
-    
-    func delete(post: Structs.Post, indexPath: IndexPath) {
-        let alert = UIAlertController(title: "Delete Post", message: "You are about to delete this post. Are you sure you want to continue?", preferredStyle: .actionSheet)
 
-        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { action in
-            self.tvPosts.beginUpdates()
+    func deleteAction(post: Structs.Post, indexPath: IndexPath){
+        self.tvPosts.beginUpdates()
 
-            self.deletePost(id: post.id ?? "N/A")
-            self.posts.remove(at: indexPath.row)
-            self.tvPosts.deleteRows(at: [indexPath], with: .automatic)
+        self.deletePost(id: post.id ?? "N/A")
+        self.posts.remove(at: indexPath.row)
+        self.tvPosts.deleteRows(at: [indexPath], with: .automatic)
 
-            self.tvPosts.endUpdates()
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        alert.addAction(deleteAction)
-        alert.addAction(cancelAction)
-
-        alert.popoverPresentationController?.sourceView = self.view
-
-        self.present(alert, animated: true, completion: nil)
+        self.tvPosts.endUpdates()
     }
-
+    
     @objc func refresh(_ sender: AnyObject) {
         getPosts()
     }
@@ -84,10 +71,8 @@ class FirstPageVC: UIViewController {
                          post: selectedPost,
                          delegate: self,
                          actionType: .create)
-
-//        createPost(title: "title1", body: "Bodzyyyy", userId: 1)
     }
-
+    
     //MARK: Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "firstPageVCToSecondPageVC" {
@@ -114,9 +99,7 @@ extension FirstPageVC: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "FirstPageVCContentCell") as! FirstPageVCContentCell
         let post = posts[indexPath.row]
         
-        cell.lblTitle.text = post.title
-        cell.lblBody.text = post.body
-
+        cell.configureCell(post: post)
         return cell
     }
     
@@ -129,7 +112,10 @@ extension FirstPageVC: UITableViewDelegate, UITableViewDataSource {
         let postSelected = self.posts[indexPath.row]
 
         let deleteAction = UIContextualAction(style: .destructive, title: nil) { (_, _, completionHandler) in
-            self.delete(post: postSelected, indexPath: indexPath)
+            self.showActionSeetWithCompletion(title: "Delete Post",
+                                         message: "You are about to delete this post. Are you sure you want to continue?") {
+                self.deleteAction(post: postSelected, indexPath: indexPath)
+            }
             completionHandler(true)
         }
         let editAction = UIContextualAction(style: .destructive, title: nil) { (_, _, completionHandler) in
@@ -178,7 +164,7 @@ extension FirstPageVC {
                                 //continue
                             }
                             else{
-                                //showError
+                                //Show Failure Alert
                             }
                         }
                     }
@@ -199,15 +185,12 @@ extension FirstPageVC {
         
         let url = "\(Constants.urlPrefix)/posts/\(id)"
         let params: [String : AnyObject] = [:]
-
+        
         RequestManager.sharedManager.delete(url: url, parameters: params, raw: false, loading: false) { response in
             self.hideProgressBar()
-//            if let postEdited = response as? NSDictionary {
-                //ShowAlert "Deleted"
-//            }
         } failure: { error in
             self.hideProgressBar()
-            //ShowAlert
+            //Show Failure Alert
         }
     }
     
@@ -257,7 +240,7 @@ extension FirstPageVC:CustomPopupDelegate {
                         tvPosts.scrollToBottom()
                     }
                     else{
-                        
+                        //Show Failure Alert
                     }
                 }
             }
@@ -270,7 +253,7 @@ extension FirstPageVC:CustomPopupDelegate {
                         tvPosts.reloadData()
                     }
                     else{
-                        
+                        //Show Failure Alert
                     }
                 }
             }

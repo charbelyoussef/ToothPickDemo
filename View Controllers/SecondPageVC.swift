@@ -16,7 +16,6 @@ class SecondPageVC: UIViewController {
     @IBOutlet weak var btnReadMore: UIButton!
     @IBOutlet weak var vTitleContainer: UIView!
     
-    @IBOutlet weak var cstrDescriptionHeight: NSLayoutConstraint!
     var isExpanded = false
     
     //MARK: Class Variables
@@ -25,9 +24,7 @@ class SecondPageVC: UIViewController {
     //MARK: Lifecycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
         initViews()
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -42,12 +39,10 @@ class SecondPageVC: UIViewController {
         vTitleContainer.layer.borderWidth = 1
         vTitleContainer.layer.borderColor = UIColor(hexString: "#F4F4F4").cgColor
         
-        vTitleContainer.layer.shadowColor = UIColor(hexString: "#000029").cgColor
-        vTitleContainer.clipsToBounds = false
-        vTitleContainer.layer.shadowOpacity = 0.1
-        vTitleContainer.layer.shadowRadius = 3.0
-        vTitleContainer.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-
+        vTitleContainer.addShadow(radius: 3.0,
+                                  offset: CGSize(width: 0.0, height: 0.0),
+                                  color: UIColor(hexString: "#000029"),
+                                  opacity: 0.1)
     }
 
     //MARK: Buttons Actions
@@ -57,7 +52,6 @@ class SecondPageVC: UIViewController {
     
     @IBAction func btnReadMoreAction(_ sender: Any) {
         isExpanded = !isExpanded
-        
         
         if isExpanded {
             lblDescriptionValue.numberOfLines = 0

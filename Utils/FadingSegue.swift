@@ -15,12 +15,9 @@ class FadingSegue: UIStoryboardSegue {
         destination.transitioningDelegate = self
         super.perform()
     }
-    
 }
 
 class FadingViewController: UIViewController {
-    
-    
     
 }
 
