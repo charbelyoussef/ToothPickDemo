@@ -7,7 +7,6 @@ target 'ToothpickDemo (iOS)' do
 
   # Pods for ToothpickDemo (iOS)
 
-
 	pod 'Alamofire'
 	pod 'JGProgressHUD'
 
